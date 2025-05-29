@@ -13,11 +13,14 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
         pinMode(m_screen_cs[i], OUTPUT);
         digitalWrite(m_screen_cs[i], LOW);
     }
-
+    // Log.noticeln("OrbRatation: %d", ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION));
     m_tft.init();
-    m_tft.setRotation(ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION));
+    // m_tft.setRotation(ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION));
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
+    m_tft.writecommand(0x36); // MADCTL
+    m_tft.writedata(0x40); // Horizontal mirror (MX bit)
+    //applyCustomRotation(180, false); // Rotate 0°, mirror X
     reset();
 
     // Init TJpg_Decode
@@ -413,6 +416,33 @@ uint16_t ScreenManager::color565FromHex(const String &hex) {
         (rgb >> 8) & 0xFF, // Green
         rgb & 0xFF // Blue
     );
+}
+
+void ScreenManager::applyCustomRotation(int rotation, bool mirrorX, bool mirrorY) {
+    uint8_t madctl = 0;
+
+    switch (rotation % 4) {
+    case 0:
+        madctl = 0x00;
+        break;
+    case 1:
+        madctl = 0x20;
+        break; // rotate 90
+    case 2:
+        madctl = 0xC0;
+        break; // rotate 180
+    case 3:
+        madctl = 0x60;
+        break; // rotate 270
+    }
+
+    if (mirrorX)
+        madctl |= 0x40;
+    if (mirrorY)
+        madctl |= 0x80;
+
+    m_tft.writecommand(0x36);
+    m_tft.writedata(madctl);
 }
 
 void ScreenManager::drawTitleBars(uint16_t topColor, uint16_t bottomColor,

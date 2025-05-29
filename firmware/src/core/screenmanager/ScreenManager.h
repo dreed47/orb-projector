@@ -108,6 +108,8 @@ public:
 private:
     static ScreenManager *instance;
 
+    void applyCustomRotation(int rotation, bool mirrorX = true, bool mirrorY = false);
+
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI &m_tft;
     OpenFontRender m_render;
