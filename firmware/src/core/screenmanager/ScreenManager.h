@@ -121,6 +121,10 @@ private:
     OpenFontRender &getRender();
     unsigned int getScaledFontSize(unsigned int fontSize);
     uint16_t dim(uint16_t color);
+
+#ifndef MIRROR_DISPLAY
+    #define MIRROR_DISPLAY false
+#endif
 };
 
 #endif // SCREENMANAGER_H

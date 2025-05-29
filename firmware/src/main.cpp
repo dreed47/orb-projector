@@ -16,7 +16,12 @@ ConfigManager *config{nullptr};
 OrbsWiFiManager *wifiManager{nullptr};
 WidgetSet *widgetSet{nullptr};
 
+const int potPin = 34; // Analog input for potentiometer
+const int pwmPin = 16; // PWM output to driver PWM pin
+
 void setup() {
+    ledcSetup(0, 5000, 8); // Channel 0, 5kHz, 8-bit resolution
+    ledcAttachPin(pwmPin, 0); // Attach PWM pin
     // Initialize global resources
     initializeGlobalResources();
 
@@ -88,6 +93,9 @@ void loop() {
         wifiManager->process();
         TaskManager::getInstance()->processAwaitingTasks();
         TaskManager::getInstance()->processTaskResponses();
+        int potValue = analogRead(potPin); // Read 0–4095
+        int dutyCycle = map(potValue, 0, 4095, 0, 255); // Map to 0–255
+        ledcWrite(0, dutyCycle); // Set PWM duty cycle
     }
 #ifdef MEMORY_DEBUG_INTERVAL
     ShowMemoryUsage::printSerial();

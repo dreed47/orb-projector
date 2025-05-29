@@ -18,9 +18,12 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     // m_tft.setRotation(ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION));
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
-    m_tft.writecommand(0x36); // MADCTL
-    m_tft.writedata(0x40); // Horizontal mirror (MX bit)
-    //applyCustomRotation(180, false); // Rotate 0°, mirror X
+    if (MIRROR_DISPLAY) {
+        m_tft.writecommand(0x36); // MADCTL
+        m_tft.writedata(0x40); // Horizontal mirror (MX bit)
+        // applyCustomRotation(180, false); // Rotate 0°, mirror X
+    }
+
     reset();
 
     // Init TJpg_Decode
